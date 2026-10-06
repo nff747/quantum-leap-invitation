@@ -139,12 +139,14 @@ html, body {
 }
 
 .beam-1 {
-  left: 20%;
+  left: 22%;
+  top: 14%;
   transform: rotate(14deg);
 }
 
 .beam-2 {
-  left: 31%;
+  left: 32%;
+  top: 18%;
   transform: rotate(26deg);
 }
 
@@ -250,26 +252,26 @@ body.clean-mode .penguin-video-container {
 
 /* Top left spotlights */
 .hotspot-spotlights {
-  top: 9.5%;
-  left: 9%;
-  width: 20%;
+  top: 13%;
+  left: 13%;
+  width: 19%;
   height: 18%;
   cursor: pointer;
 }
 
 /* Top right lily flower */
 .hotspot-lily {
-  top: 10.5%;
-  right: 4%;
-  width: 26%;
-  height: 16%;
+  top: 13%;
+  right: 6%;
+  width: 25%;
+  height: 15%;
   cursor: pointer;
 }
 
 /* Shooting star */
 .hotspot-star {
-  top: 29.5%;
-  right: 14%;
+  top: 31%;
+  right: 15%;
   width: 10%;
   height: 6%;
   cursor: pointer;
@@ -277,10 +279,10 @@ body.clean-mode .penguin-video-container {
 
 /* Penguins (invisible hotspot covering the entire illustration) */
 .hotspot-penguins {
-  top: 44%;
-  left: 20%;
-  width: 60%;
-  height: 22%;
+  top: 45%;
+  left: 24%;
+  width: 52%;
+  height: 21%;
   cursor: pointer;
   background: transparent;
   border: none;
@@ -288,8 +290,8 @@ body.clean-mode .penguin-video-container {
 
 /* Dancers */
 .hotspot-dancers {
-  top: 63%;
-  left: 5%;
+  top: 65%;
+  left: 6%;
   width: 28%;
   height: 17%;
   cursor: pointer;
@@ -297,9 +299,9 @@ body.clean-mode .penguin-video-container {
 
 /* Date & Time */
 .hotspot-date {
-  top: 66%;
-  left: 28%;
-  width: 56%;
+  top: 68%;
+  left: 30%;
+  width: 54%;
   height: 16%;
   cursor: pointer;
 }
