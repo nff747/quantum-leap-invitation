@@ -42,6 +42,30 @@
   const dateBtn = document.getElementById('dateBtn');
 
   // ==========================================================================
+  // Telemetry & Advanced Analytics Helper (Microsoft Clarity)
+  // ==========================================================================
+  function trackMove(eventName, metadata) {
+    try {
+      if (typeof window.clarity === 'function') {
+        window.clarity('event', eventName);
+        if (metadata && typeof metadata === 'object') {
+          for (const key in metadata) {
+            if (Object.prototype.hasOwnProperty.call(metadata, key)) {
+              window.clarity('set', key, String(metadata[key]));
+            }
+          }
+        }
+      }
+    } catch (e) {
+      // analytics fail-safe
+    }
+  }
+
+  // Record initial visit event
+  trackMove('invitation_viewed', { referrer: document.referrer || 'direct' });
+
+
+  // ==========================================================================
   // Canvas FX Particle Engine
   // ==========================================================================
   const ctx = fxCanvas.getContext('2d');
@@ -176,6 +200,7 @@
       const isActive = spotlightBeams.classList.toggle('active');
       showToast(isActive ? '🔦 Stage Spotlights On!' : 'Stage Spotlights Off');
       playTone(isActive ? 660 : 440, 0.1);
+      trackMove('spotlights_toggled', { state: isActive ? 'on' : 'off' });
     });
   }
 
@@ -187,6 +212,7 @@
       const y = e.clientY - rect.top;
       spawnParticles(x, y, 24, 'petal');
       showToast('🌸 Crimson petals floating...');
+      trackMove('petals_showered');
     });
   }
 
@@ -199,6 +225,7 @@
       spawnParticles(x, y, 35, 'star', { color: '#fde047' });
       playTone(880, 0.15, 'sine');
       showToast('💫 Quantum Leap is shining!');
+      trackMove('star_twinkled');
     });
   }
 
@@ -253,6 +280,7 @@
     }
 
     showToast('🐧 The party is live! Madagascar penguins taking over! 🎵');
+    trackMove('penguin_video_started');
   }
 
   function pausePenguinVideo() {
@@ -260,9 +288,11 @@
     if (penguinVideo.paused) {
       penguinVideo.play();
       btnVideoPause.textContent = '⏸️';
+      trackMove('penguin_video_resumed');
     } else {
       penguinVideo.pause();
       btnVideoPause.textContent = '▶️';
+      trackMove('penguin_video_paused');
     }
   }
 
@@ -270,6 +300,7 @@
     if (!penguinVideo) return;
     penguinVideo.muted = !penguinVideo.muted;
     btnVideoSound.textContent = penguinVideo.muted ? '🔇' : '🔊';
+    trackMove('penguin_video_sound_toggled', { muted: String(penguinVideo.muted) });
   }
 
   function replayPenguinVideo() {
@@ -277,11 +308,13 @@
     penguinVideo.currentTime = 0;
     penguinVideo.play();
     btnVideoPause.textContent = '⏸️';
+    trackMove('penguin_video_replayed');
   }
 
   function closePenguinVideo(e) {
     if (e) e.stopPropagation();
     if (!penguinVideo) return;
+    trackMove('penguin_video_closed');
     penguinVideo.pause();
     penguinVideo.currentTime = 0;
     penguinVideoContainer.classList.remove('playing');
@@ -309,6 +342,7 @@
   if (penguinVideo) {
     penguinVideo.addEventListener('ended', () => {
       // Revert seamlessly to invitation card once video finishes
+      trackMove('penguin_video_completed');
       closePenguinVideo();
       showToast('🐧 That was a blast! Tap penguins to watch again.');
     });
@@ -327,12 +361,14 @@
       playTone(440, 0.1, 'triangle');
       setTimeout(() => playTone(554.37, 0.1, 'triangle'), 120);
       showToast('🕺💃 Groovin’ to the party tracks!');
+      trackMove('dancers_grooved');
     });
   }
 
   // 6. Date click -> open Calendar Options
   if (dateBtn) {
     dateBtn.addEventListener('click', () => {
+      trackMove('date_hotspot_clicked');
       toggleCalendarDropdown();
     });
   }
@@ -362,6 +398,7 @@
 
   if (countdownBtn) {
     countdownBtn.addEventListener('click', () => {
+      trackMove('countdown_badge_clicked');
       showToast('Event: 10 October 2026 at 10:00 AM IST (Indian Standard Time)');
     });
   }
@@ -387,6 +424,9 @@
 
   if (googleCalLink) {
     googleCalLink.href = getGoogleCalendarUrl();
+    googleCalLink.addEventListener('click', () => {
+      trackMove('google_calendar_clicked');
+    });
   }
 
   function downloadIcs() {
@@ -433,7 +473,10 @@
   }
 
   if (downloadIcsBtn) {
-    downloadIcsBtn.addEventListener('click', downloadIcs);
+    downloadIcsBtn.addEventListener('click', () => {
+      trackMove('ics_downloaded');
+      downloadIcs();
+    });
   }
 
   function toggleCalendarDropdown() {
@@ -447,6 +490,7 @@
   if (calendarMenuBtn) {
     calendarMenuBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      trackMove('calendar_menu_toggled');
       toggleCalendarDropdown();
     });
   }
@@ -460,6 +504,7 @@
   // Copy Link
   if (copyShareBtn) {
     copyShareBtn.addEventListener('click', () => {
+      trackMove('share_link_copied');
       const url = window.location.href;
       if (navigator.clipboard) {
         navigator.clipboard.writeText(url).then(() => {
@@ -583,6 +628,7 @@
 
     btn.querySelector('.like-num').textContent = item.likes;
     saveShoutouts(list);
+    trackMove('shoutout_liked', { post_id: id, total_likes: item.likes });
   }
 
   function escapeHtml(str) {
@@ -598,6 +644,7 @@
 
   // Tab switching
   function switchTab(tabName) {
+    trackMove('ama_tab_switched', { tab: tabName });
     if (tabName === 'drop') {
       tabDropBtn.classList.add('active');
       tabFeedBtn.classList.remove('active');
@@ -616,12 +663,14 @@
   if (tabFeedBtn) tabFeedBtn.addEventListener('click', () => switchTab('feed'));
 
   function openRsvp() {
+    trackMove('ama_wall_opened');
     renderWall();
     switchTab('drop');
     rsvpModal.showModal();
   }
 
   function closeRsvp() {
+    trackMove('ama_wall_closed');
     rsvpModal.close();
     setTimeout(() => {
       rsvpForm.hidden = false;
@@ -659,6 +708,8 @@
       const list = getShoutouts();
       list.unshift(newDrop);
       saveShoutouts(list);
+
+      trackMove('shoutout_submitted', { category: category, codename: codename });
 
       // Confetti shower!
       const rect = fxCanvas.getBoundingClientRect();
@@ -776,6 +827,7 @@
   function toggleMusic() {
     initAudio();
     isPlayingMusic = !isPlayingMusic;
+    trackMove('ambient_music_toggled', { playing: String(isPlayingMusic) });
 
     if (isPlayingMusic) {
       musicToggleBtn.classList.add('active');
@@ -803,6 +855,7 @@
     modeToggleBtn.addEventListener('click', () => {
       isCleanMode = !isCleanMode;
       document.body.classList.toggle('clean-mode', isCleanMode);
+      trackMove('clean_mode_toggled', { clean: String(isCleanMode) });
       if (isCleanMode) {
         modeToggleBtn.title = 'Restore interactive view';
         showToast('🖼️ Clean Invitation Mode (Exact flyer view)');
