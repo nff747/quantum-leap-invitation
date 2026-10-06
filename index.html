@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>QUANTUM LEAP 💫 | Invitation</title>
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+  <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet">
+  <meta name="theme-color" content="#5f031a">
+
+  <!-- OpenGraph / Social preview -->
+  <meta property="og:title" content="QUANTUM LEAP 💫 — Official Invitation">
+  <meta property="og:description" content="Celebrating the birth of new luminous batch (●'◡'●). Theme: Western. The drop: 10 Oct 2026, 10 AM.">
+  <meta property="og:image" content="assets/invitation-reference.png">
+
+  <!-- Google Fonts for rich fallbacks and modals -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Cinzel:wght@600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Ambient background glow on wide screens -->
+  <div class="ambient-glow" aria-hidden="true"></div>
+
+  <!-- Main Viewport Container -->
+  <main class="invitation-container">
+    <div class="card-wrapper" id="cardWrapper">
+      <!-- The Invitation Card Element -->
+      <div class="invitation-card" id="invitationCard" role="region" aria-label="Quantum Leap Invitation">
+        
+        <!-- High-res base visual of the invitation -->
+        <img 
+          src="assets/card-bg-2x.png" 
+          alt="QUANTUM LEAP Invitation — Celebrating the birth of new luminous batch. Theme: Western. The drop: 10 Oct 2026, Live at 10 AM." 
+          class="card-base-img" 
+          id="cardImg"
+          draggable="false"
+        >
+
+        <!-- Canvas for dynamic particle effects (sparkles, petals, confetti) -->
+        <canvas id="fxCanvas" class="fx-canvas" aria-hidden="true"></canvas>
+
+        <!-- Stage Spotlight Beams (Layered over card when active) -->
+        <div class="spotlight-beams" id="spotlightBeams" aria-hidden="true">
+          <div class="beam beam-1"></div>
+          <div class="beam beam-2"></div>
+        </div>
+
+        <!-- Living Penguin Video Overlay (Takes over full card when triggered) -->
+        <div class="penguin-video-container" id="penguinVideoContainer" aria-hidden="true">
+          <video 
+            id="penguinVideo" 
+            class="penguin-video" 
+            src="assets/penguin_animation.mp4" 
+            playsinline 
+            preload="auto"
+          ></video>
+          <div class="video-playback-bar" id="videoPlaybackBar">
+            <button type="button" class="btn-mini-control" id="btnVideoPause" aria-label="Pause / Resume">⏸️</button>
+            <button type="button" class="btn-mini-control" id="btnVideoSound" aria-label="Mute / Unmute">🔊</button>
+            <button type="button" class="btn-mini-control" id="btnVideoReplay" aria-label="Replay animation">↺</button>
+            <button type="button" class="btn-mini-control" id="btnVideoClose" aria-label="Close video">✕</button>
+          </div>
+        </div>
+
+        <!-- Interactive Hotspots -->
+        <div class="hotspots-layer" id="hotspotsLayer">
+          
+          <!-- Hanging spotlights hotspot -->
+          <button 
+            type="button" 
+            class="hotspot hotspot-spotlights" 
+            id="spotlightsBtn" 
+            title="Toggle stage lights" 
+            aria-label="Toggle stage spotlights"
+          >
+            <span class="hotspot-pulse"></span>
+          </button>
+
+          <!-- Lily flower hotspot -->
+          <button 
+            type="button" 
+            class="hotspot hotspot-lily" 
+            id="lilyBtn" 
+            title="Shower crimson petals" 
+            aria-label="Shower crimson petals"
+          >
+            <span class="hotspot-pulse"></span>
+          </button>
+
+          <!-- Quantum Leap shooting star hotspot -->
+          <button 
+            type="button" 
+            class="hotspot hotspot-star" 
+            id="starBtn" 
+            title="Twinkle shooting star" 
+            aria-label="Twinkle shooting star"
+          >
+            <span class="sparkle-ring"></span>
+          </button>
+
+          <!-- Penguins illustration hotspot (invisible clickable area) -->
+          <button 
+            type="button" 
+            class="hotspot hotspot-penguins" 
+            id="penguinsBtn" 
+            title="Bring penguins to life!" 
+            aria-label="Bring penguins to life with music"
+          ></button>
+
+          <!-- Dancers silhouette hotspot -->
+          <button 
+            type="button" 
+            class="hotspot hotspot-dancers" 
+            id="dancersBtn" 
+            title="Let's groove!" 
+            aria-label="Disco dancers groove"
+          >
+            <span class="music-notes" id="danceNotes">🎵 ✨</span>
+          </button>
+
+          <!-- Date & Time hotspot -->
+          <button 
+            type="button" 
+            class="hotspot hotspot-date" 
+            id="dateBtn" 
+            title="Add to Calendar / View countdown" 
+            aria-label="Event date October 10 2026, 10 AM. Click to add to calendar."
+          >
+            <span class="calendar-hint">📅 Add to Calendar</span>
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Elegant Floating Action Bar / Controls -->
+  <aside class="action-bar-container" aria-label="Invitation Controls">
+    <div class="action-bar" id="actionBar">
+      <!-- Live countdown badge -->
+      <button type="button" class="btn-action btn-countdown" id="countdownBtn" title="Click to view full event timeline">
+        <span class="icon">⏳</span>
+        <span class="countdown-text" id="countdownText">Calculating...</span>
+      </button>
+
+      <!-- Anonymous Q&A / Shoutout button -->
+      <button type="button" class="btn-action btn-rsvp" id="openRsvpBtn">
+        <span class="icon">💬</span>
+        <span class="label">Senior AMA & Wall</span>
+      </button>
+
+      <!-- Add to calendar dropdown trigger -->
+      <button type="button" class="btn-action btn-secondary" id="calendarMenuBtn" title="Add to your calendar">
+        <span class="icon">📅</span>
+        <span class="label">Calendar</span>
+      </button>
+
+      <!-- Music Toggle -->
+      <button type="button" class="btn-action btn-icon" id="musicToggleBtn" title="Play ambient party lofi synth" aria-label="Toggle ambient music">
+        <span class="icon" id="musicIcon">🎵</span>
+      </button>
+
+      <!-- Mode Toggle: Pure vs Interactive -->
+      <button type="button" class="btn-action btn-icon" id="modeToggleBtn" title="Toggle Clean Invitation / Interactive Mode" aria-label="Toggle clean invitation view">
+        <span class="icon" id="modeIcon">👁️</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Calendar Options Popup -->
+  <div class="calendar-dropdown" id="calendarDropdown" role="menu" aria-hidden="true">
+    <a href="#" class="dropdown-item" id="googleCalLink" target="_blank" rel="noopener">
+      <span class="icon">🌐</span> Google Calendar
+    </a>
+    <button type="button" class="dropdown-item" id="downloadIcsBtn">
+      <span class="icon">📥</span> Apple / Outlook (.ics)
+    </button>
+    <button type="button" class="dropdown-item" id="copyShareBtn">
+      <span class="icon">🔗</span> Copy Invitation Link
+    </button>
+  </div>
+
+  <!-- Anonymous Senior Q&A & Shoutout Wall Modal -->
+  <dialog class="rsvp-modal" id="rsvpModal" aria-labelledby="rsvpTitle">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-content">
+      <button type="button" class="close-btn" id="closeRsvpBtn" aria-label="Close dialog">&times;</button>
+      
+      <div class="modal-header">
+        <div class="modal-badge">🔒 100% ANONYMOUS • NO NAMES STORED</div>
+        <h2 id="rsvpTitle">Senior AMA & Confessions 💬</h2>
+        <p class="modal-subtitle">Ask for campus survival fundas, roast a senior, request a DJ track, or share hostel confessions. Completely anonymous.</p>
+      </div>
+
+      <!-- Navigation Tabs: Drop vs Wall -->
+      <div class="wall-tabs" role="tablist">
+        <button type="button" class="wall-tab active" id="tabDropBtn" role="tab" aria-selected="true">
+          ✍️ Write a Note
+        </button>
+        <button type="button" class="wall-tab" id="tabFeedBtn" role="tab" aria-selected="false">
+          🔥 The Live Wall (<span id="wallCount">4</span>)
+        </button>
+      </div>
+
+      <!-- Tab 1: Drop Form -->
+      <div class="tab-pane active" id="paneDrop">
+        <form id="rsvpForm" class="rsvp-form">
+          <div class="form-group">
+            <label for="shoutoutCategory">Pick a category</label>
+            <select id="shoutoutCategory" name="shoutoutCategory">
+              <option value="Ask Seniors 🙋">🙋 Ask Seniors (Branch fundas & Survival tips)</option>
+              <option value="Senior Roast 🔥">🔥 Senior Roast & Fun Dares</option>
+              <option value="Wing Shoutout 🍻">🍻 Wing & Hostel Shoutouts</option>
+              <option value="DJ Song Request 🎧">🎧 DJ Song Request (Bolly / Punjabi / EDM)</option>
+              <option value="Hostel Confession 🤫">🤫 Late-Night Hostel Confession</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="shoutoutMessage">Your Message (Say it without hesitation)</label>
+            <textarea 
+              id="shoutoutMessage" 
+              name="shoutoutMessage" 
+              rows="3" 
+              placeholder="Ask for exam survival notes, request a banger song for the DJ, or confess who stole the wing Maggi... 100% untraceable." 
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="shoutoutCodename">Codename / Pen Name (Optional)</label>
+            <input 
+              type="text" 
+              id="shoutoutCodename" 
+              name="shoutoutCodename" 
+              placeholder="e.g. 2nd Floor Maggi King / Backbencher (Default: Anonymous Fresher 🕶️)"
+            >
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitRsvpBtn">
+            Post Anonymously 📌
+          </button>
+        </form>
+
+        <div class="rsvp-success-message" id="rsvpSuccessMessage" hidden>
+          <div class="success-icon">📌🔥🎉</div>
+          <h3>Pinned to the Board!</h3>
+          <p>Your note has been submitted anonymously. Seniors will read and answer the best ones on stage during Quantum Leap!</p>
+          <button type="button" class="submit-btn" id="closeSuccessBtn">See What Everyone's Saying 👀</button>
+        </div>
+      </div>
+
+      <!-- Tab 2: Wall Feed -->
+      <div class="tab-pane" id="paneFeed" hidden>
+        <div class="wall-feed-container" id="wallFeed">
+          <!-- Feed items injected via JS -->
+        </div>
+      </div>
+
+    </div>
+  </dialog>
+
+  <!-- Toast Notification Container -->
+  <div class="toast" id="toastNotification" role="alert" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,995 @@
+/* ==========================================================================
+   QUANTUM LEAP INVITATION — STYLESHEET
+   Accurate 1:1 Flyer Presentation with Modern Interactive Experience
+   ========================================================================== */
+
+:root {
+  --bg-maroon: #5f031a;
+  --bg-maroon-dark: #3f0110;
+  --gold-accent: #fcd34d;
+  --gold-glow: rgba(252, 211, 77, 0.4);
+  --text-dark: #1e1b18;
+  --card-white: #ffffff;
+  --glass-bg: rgba(40, 3, 11, 0.78);
+  --glass-border: rgba(252, 211, 77, 0.25);
+  --glass-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+  --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--bg-maroon);
+  color: #fff;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Background subtle ambient lighting on desktop */
+.ambient-glow {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 45%, rgba(160, 20, 50, 0.28) 0%, rgba(95, 3, 26, 0.95) 70%, #3f0110 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Main Layout Container */
+.invitation-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  padding-bottom: 96px; /* space for bottom floating dock */
+}
+
+/* Card Wrapper with responsive constraint */
+.card-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+/* The Invitation Card - strictly locked to 9:16 aspect ratio */
+.invitation-card {
+  position: relative;
+  width: min(540px, calc((100dvh - 120px) * (9 / 16)), 92vw);
+  aspect-ratio: 9 / 16;
+  height: auto;
+  margin: auto;
+  border-radius: 8px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(130, 10, 40, 0.3);
+  overflow: hidden;
+  background-color: var(--bg-maroon);
+  transition: transform 0.3s ease;
+}
+
+@media (hover: hover) {
+  .invitation-card:hover {
+    transform: translateY(-2px);
+  }
+}
+
+/* Base high-res invitation image */
+.card-base-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+/* Canvas for interactive particle effects */
+.fx-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ==========================================================================
+   Spotlight Beams FX
+   ========================================================================== */
+.spotlight-beams {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.spotlight-beams.active {
+  opacity: 1;
+}
+
+.beam {
+  position: absolute;
+  top: 18%;
+  width: 140px;
+  height: 480px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 245, 200, 0.45) 0%, rgba(255, 230, 160, 0.18) 45%, rgba(255, 230, 150, 0) 100%);
+  filter: blur(8px);
+  transform-origin: top center;
+  mix-blend-mode: screen;
+}
+
+.beam-1 {
+  left: 20%;
+  transform: rotate(14deg);
+}
+
+.beam-2 {
+  left: 31%;
+  transform: rotate(26deg);
+}
+
+/* ==========================================================================
+   Penguin Living Video Overlay (Full Card Takeover)
+   ========================================================================== */
+.penguin-video-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 22;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+  background-color: var(--bg-maroon);
+}
+
+.penguin-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.penguin-video-container.playing {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  box-shadow: 0 0 35px rgba(252, 211, 77, 0.45), 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Video Playback Bar */
+.video-playback-bar {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  background: rgba(20, 1, 6, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--gold-accent);
+  border-radius: 24px;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 15px rgba(252, 211, 77, 0.3);
+  z-index: 25;
+}
+
+.btn-mini-control {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: transform 0.15s ease, background 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-mini-control:hover {
+  transform: scale(1.18);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Hide video in clean mode */
+body.clean-mode .penguin-video-container {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Hotspots Layer
+   ========================================================================== */
+.hotspots-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+}
+
+.hotspot {
+  position: absolute;
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Top left spotlights */
+.hotspot-spotlights {
+  top: 9.5%;
+  left: 9%;
+  width: 20%;
+  height: 18%;
+  cursor: pointer;
+}
+
+/* Top right lily flower */
+.hotspot-lily {
+  top: 10.5%;
+  right: 4%;
+  width: 26%;
+  height: 16%;
+  cursor: pointer;
+}
+
+/* Shooting star */
+.hotspot-star {
+  top: 29.5%;
+  right: 14%;
+  width: 10%;
+  height: 6%;
+  cursor: pointer;
+}
+
+/* Penguins (invisible hotspot covering the entire illustration) */
+.hotspot-penguins {
+  top: 44%;
+  left: 20%;
+  width: 60%;
+  height: 22%;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
+
+/* Dancers */
+.hotspot-dancers {
+  top: 63%;
+  left: 5%;
+  width: 28%;
+  height: 17%;
+  cursor: pointer;
+}
+
+/* Date & Time */
+.hotspot-date {
+  top: 66%;
+  left: 28%;
+  width: 56%;
+  height: 16%;
+  cursor: pointer;
+}
+
+/* Hotspot hints (visible only on hover or when interactive mode is active) */
+.hotspot-pulse {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 215, 0, 0.35);
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.6);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.interactive-mode .hotspot:hover .hotspot-pulse,
+.interactive-mode .hotspot:focus-visible .hotspot-pulse {
+  opacity: 1;
+  transform: scale(1.1);
+  animation: pulseLoop 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes pulseLoop {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  100% { transform: scale(1.3); opacity: 0.95; }
+}
+
+/* Sparkle ring around shooting star */
+.sparkle-ring {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(255, 220, 100, 0.7);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  animation: rotateSparkle 8s linear infinite;
+}
+
+.hotspot-star:hover .sparkle-ring {
+  opacity: 1;
+}
+
+@keyframes rotateSparkle {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Toast Bubble on Penguins click */
+.toast-bubble {
+  position: absolute;
+  top: -15px;
+  background: rgba(20, 20, 20, 0.9);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--gold-accent);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(6px) scale(0.9);
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+}
+
+.toast-bubble.show {
+  opacity: 1;
+  transform: translateY(-8px) scale(1);
+}
+
+/* Dancing notes on Dancers click */
+.music-notes {
+  position: absolute;
+  top: -12px;
+  font-size: 16px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: all 0.2s ease;
+  pointer-events: none;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+.music-notes.show {
+  opacity: 1;
+  transform: translateY(-10px);
+  animation: floatNote 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes floatNote {
+  0% { transform: translateY(-10px) rotate(-6deg); }
+  100% { transform: translateY(-18px) rotate(6deg); }
+}
+
+/* Date badge hint */
+.calendar-hint {
+  position: absolute;
+  bottom: -6px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #3b0311;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0,0,0,0.1);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.hotspot-date:hover .calendar-hint {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   Bottom Floating Action Bar
+   ========================================================================== */
+.action-bar-container {
+  position: fixed;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  padding: 0 12px;
+  pointer-events: none;
+}
+
+.action-bar {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 40px;
+  box-shadow: var(--glass-shadow);
+  max-width: 95vw;
+}
+
+.btn-action {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 30px;
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  white-space: nowrap;
+}
+
+.btn-action:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-action:active {
+  transform: translateY(1px);
+}
+
+.btn-countdown {
+  background: rgba(252, 211, 77, 0.15);
+  border-color: rgba(252, 211, 77, 0.3);
+  color: #fef3c7;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+}
+
+.btn-countdown:hover {
+  background: rgba(252, 211, 77, 0.25);
+}
+
+.btn-rsvp {
+  background: linear-gradient(135deg, #fcd34d, #f59e0b);
+  color: #3b0311;
+  border: none;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+}
+
+.btn-rsvp:hover {
+  background: linear-gradient(135deg, #fde68a, #fbbf24);
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.6);
+  transform: translateY(-2px);
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 15px;
+}
+
+.btn-icon.active {
+  background: rgba(252, 211, 77, 0.3);
+  border-color: var(--gold-accent);
+}
+
+/* Hide controls in Clean Mode */
+body.clean-mode .action-bar .btn-countdown,
+body.clean-mode .action-bar .btn-rsvp,
+body.clean-mode .action-bar .btn-secondary,
+body.clean-mode .action-bar #musicToggleBtn {
+  display: none;
+}
+
+body.clean-mode .hotspot-pulse,
+body.clean-mode .sparkle-ring,
+body.clean-mode .calendar-hint {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Calendar Dropdown Menu
+   ========================================================================== */
+.calendar-dropdown {
+  position: fixed;
+  bottom: 74px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px) scale(0.95);
+  background: #1e0208;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: 16px;
+  padding: 8px;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 60;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.calendar-dropdown.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: transparent;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+  font-family: inherit;
+}
+
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--gold-accent);
+}
+
+/* ==========================================================================
+   RSVP Modal
+   ========================================================================== */
+.rsvp-modal {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  border: none;
+  background: transparent;
+  padding: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.rsvp-modal[open] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 1, 6, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.modal-content {
+  position: relative;
+  z-index: 2;
+  width: 92%;
+  max-width: 440px;
+  background: #25020a;
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 28px 24px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+  color: #fff;
+  transform: translateY(20px) scale(0.96);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rsvp-modal[open] .modal-content {
+  transform: translateY(0) scale(1);
+}
+
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.modal-badge {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  color: var(--gold-accent);
+  background: rgba(252, 211, 77, 0.15);
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+
+.modal-header h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  color: #fff;
+}
+
+.modal-subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 20px;
+}
+
+.event-meta-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.meta-icon {
+  font-size: 18px;
+}
+
+.meta-row strong {
+  display: block;
+  color: #fff;
+}
+
+.meta-row .subtext {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.rsvp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--gold-accent);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.form-group select option {
+  background: #25020a;
+  color: #fff;
+}
+
+/* Wall Tabs */
+.wall-tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  gap: 4px;
+}
+
+.wall-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wall-tab:hover {
+  color: #fff;
+}
+
+.wall-tab.active {
+  background: rgba(252, 211, 77, 0.2);
+  color: var(--gold-accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Wall Feed Container */
+.wall-feed-container {
+  max-height: 320px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 4px;
+}
+
+.wall-feed-container::-webkit-scrollbar {
+  width: 5px;
+}
+
+.wall-feed-container::-webkit-scrollbar-thumb {
+  background: rgba(252, 211, 77, 0.3);
+  border-radius: 4px;
+}
+
+.wall-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 14px;
+  transition: background 0.2s ease;
+}
+
+.wall-card:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.wall-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.wall-card-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gold-accent);
+  background: rgba(252, 211, 77, 0.15);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.wall-card-author {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.wall-card-msg {
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 8px;
+  word-break: break-word;
+}
+
+.wall-card-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.like-chip {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 14px;
+  padding: 3px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.like-chip:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.like-chip.liked {
+  background: rgba(236, 72, 153, 0.25);
+  border-color: rgba(236, 72, 153, 0.5);
+  color: #f472b6;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #fcd34d, #f59e0b);
+  color: #3b0311;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+}
+
+.rsvp-success-message {
+  text-align: center;
+  padding: 20px 10px;
+}
+
+.success-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.rsvp-success-message h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: var(--gold-accent);
+}
+
+.rsvp-success-message p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 20px;
+}
+
+/* ==========================================================================
+   Toast Notification
+   ========================================================================== */
+.toast {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: #1e0208;
+  color: #fff;
+  border: 1px solid var(--gold-accent);
+  border-radius: 30px;
+  padding: 10px 22px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: var(--glass-shadow);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 120;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+@media (max-width: 600px) {
+  .invitation-container {
+    padding: 0;
+    padding-bottom: 80px;
+  }
+  
+  .invitation-card {
+    width: min(540px, calc((100dvh - 84px) * (9 / 16)), 100vw);
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .action-bar {
+    padding: 6px 10px;
+    gap: 6px;
+  }
+
+  .btn-action {
+    padding: 7px 11px;
+    font-size: 12px;
+  }
+
+  .btn-countdown {
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
