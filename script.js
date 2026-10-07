@@ -473,20 +473,89 @@
     });
   }
 
-  // 5. Dancers click -> groove
+  // 5. Michael Jackson & Dancers click -> Hee-Hee sound!
+  const mjAudio = new Audio('assets/mj_hee_hee.mp3');
+  mjAudio.preload = 'auto';
+
+  function playVocalSyllable(startTime, startFreq, endFreq, duration) {
+    if (!audioCtx) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const formant = audioCtx.createBiquadFilter();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(startFreq, startTime);
+      osc.frequency.exponentialRampToValueAtTime(endFreq, startTime + duration * 0.7);
+      osc.frequency.exponentialRampToValueAtTime(endFreq * 0.9, startTime + duration);
+
+      formant.type = 'bandpass';
+      formant.frequency.setValueAtTime(2600, startTime);
+      formant.Q.setValueAtTime(4.0, startTime);
+
+      gain.gain.setValueAtTime(0.001, startTime);
+      gain.gain.linearRampToValueAtTime(0.22, startTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+      osc.connect(formant);
+      formant.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    } catch (e) {
+      // Audio synth fail-safe
+    }
+  }
+
+  function playMjHeeHeeSynth() {
+    try {
+      initAudio();
+      if (!audioCtx) return;
+      // Syllable 1: "Hee"
+      playVocalSyllable(audioCtx.currentTime, 750, 1020, 0.16);
+      // Syllable 2: "Hee!" (higher falsetto punch)
+      playVocalSyllable(audioCtx.currentTime + 0.19, 920, 1280, 0.24);
+    } catch (e) {
+      // Fail-safe
+    }
+  }
+
+  function playMjHeeHee() {
+    try {
+      mjAudio.currentTime = 0;
+      const playPromise = mjAudio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          playMjHeeHeeSynth();
+        });
+      }
+    } catch (e) {
+      playMjHeeHeeSynth();
+    }
+  }
+
   let danceTimer = null;
   if (dancersBtn) {
-    dancersBtn.addEventListener('click', () => {
+    dancersBtn.addEventListener('click', (e) => {
+      // Show "🕺 HEE-HEE! 🎶" badge above Michael Jackson
       danceNotes.classList.add('show');
       clearTimeout(danceTimer);
       danceTimer = setTimeout(() => {
         danceNotes.classList.remove('show');
-      }, 2500);
+      }, 2400);
 
-      playTone(440, 0.1, 'triangle');
-      setTimeout(() => playTone(554.37, 0.1, 'triangle'), 120);
-      showToast('🕺💃 Groovin’ to the party tracks!');
-      trackMove('dancers_grooved');
+      // Play the iconic Michael Jackson Hee-Hee sound effect
+      playMjHeeHee();
+
+      // Burst festive stage sparkles around Michael Jackson
+      if (canvasWidth === 0) updateCanvasDimensions();
+      const x = canvasWidth * 0.20;
+      const y = canvasHeight * 0.72;
+      spawnParticles(x, y, 22, 'star', { color: '#fef08a' });
+
+      showToast('🕺 HEE-HEE! Shamone! Michael Jackson groovin’!');
+      trackMove('mj_hee_hee_played');
     });
   }
 
