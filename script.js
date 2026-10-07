@@ -45,19 +45,27 @@
   // Telemetry & Advanced Analytics Helper (Microsoft Clarity)
   // ==========================================================================
   function trackMove(eventName, metadata) {
-    try {
-      if (typeof window.clarity === 'function') {
-        window.clarity('event', eventName);
-        if (metadata && typeof metadata === 'object') {
-          for (const key in metadata) {
-            if (Object.prototype.hasOwnProperty.call(metadata, key)) {
-              window.clarity('set', key, String(metadata[key]));
+    const dispatch = () => {
+      try {
+        if (typeof window.clarity === 'function') {
+          window.clarity('event', eventName);
+          if (metadata && typeof metadata === 'object') {
+            for (const key in metadata) {
+              if (Object.prototype.hasOwnProperty.call(metadata, key)) {
+                window.clarity('set', key, String(metadata[key]));
+              }
             }
           }
         }
+      } catch (e) {
+        // analytics fail-safe
       }
-    } catch (e) {
-      // analytics fail-safe
+    };
+
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(dispatch, { timeout: 1000 });
+    } else {
+      setTimeout(dispatch, 0);
     }
   }
 
@@ -68,20 +76,48 @@
   // ==========================================================================
   // Canvas FX Particle Engine
   // ==========================================================================
-  const ctx = fxCanvas.getContext('2d');
+  const ctx = fxCanvas ? fxCanvas.getContext('2d') : null;
   let particles = [];
   let animationFrameId = null;
+  let canvasWidth = 0;
+  let canvasHeight = 0;
+  let canvasLeft = 0;
+  let canvasTop = 0;
 
-  function resizeCanvas() {
+  function updateCanvasDimensions() {
+    if (!fxCanvas || !ctx) return;
     const rect = fxCanvas.getBoundingClientRect();
+    canvasLeft = rect.left;
+    canvasTop = rect.top;
+    canvasWidth = rect.width;
+    canvasHeight = rect.height;
     const dpr = window.devicePixelRatio || 1;
-    fxCanvas.width = rect.width * dpr;
-    fxCanvas.height = rect.height * dpr;
-    ctx.scale(dpr, dpr);
+    fxCanvas.width = canvasWidth * dpr;
+    fxCanvas.height = canvasHeight * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
-  window.addEventListener('resize', resizeCanvas);
-  setTimeout(resizeCanvas, 100);
+  let resizeTimer = null;
+  function handleResize() {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(updateCanvasDimensions, 150);
+  }
+
+  window.addEventListener('resize', handleResize, { passive: true });
+  window.addEventListener('scroll', () => {
+    if (fxCanvas) {
+      const rect = fxCanvas.getBoundingClientRect();
+      canvasLeft = rect.left;
+      canvasTop = rect.top;
+    }
+  }, { passive: true });
+
+  if (document.readyState === 'complete') {
+    updateCanvasDimensions();
+  } else {
+    window.addEventListener('load', updateCanvasDimensions, { once: true });
+    setTimeout(updateCanvasDimensions, 100);
+  }
 
   class Particle {
     constructor(x, y, type = 'star', options = {}) {
@@ -161,8 +197,8 @@
   }
 
   function runFxLoop() {
-    const rect = fxCanvas.getBoundingClientRect();
-    ctx.clearRect(0, 0, rect.width, rect.height);
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i];
@@ -181,7 +217,8 @@
   }
 
   function spawnParticles(x, y, count = 20, type = 'star', options = {}) {
-    resizeCanvas();
+    if (!ctx) return;
+    if (canvasWidth === 0) updateCanvasDimensions();
     for (let i = 0; i < count; i++) {
       particles.push(new Particle(x, y, type, options));
     }
@@ -207,9 +244,8 @@
   // 2. Lily Flower click -> shower petals
   if (lilyBtn) {
     lilyBtn.addEventListener('click', (e) => {
-      const rect = fxCanvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const x = e.clientX - canvasLeft;
+      const y = e.clientY - canvasTop;
       spawnParticles(x, y, 24, 'petal');
       showToast('🌸 Crimson petals floating...');
       trackMove('petals_showered');
@@ -219,9 +255,8 @@
   // 3. Shooting Star click -> sparkle burst
   if (starBtn) {
     starBtn.addEventListener('click', (e) => {
-      const rect = fxCanvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const x = e.clientX - canvasLeft;
+      const y = e.clientY - canvasTop;
       spawnParticles(x, y, 35, 'star', { color: '#fde047' });
       playTone(880, 0.15, 'sine');
       showToast('💫 Quantum Leap is shining!');
@@ -264,8 +299,7 @@
     }
 
     // Burst festive stars
-    const rect = fxCanvas.getBoundingClientRect();
-    spawnParticles(rect.width / 2, rect.height * 0.5, 30, 'star', { color: '#fde047' });
+    spawnParticles(canvasWidth / 2, canvasHeight * 0.5, 30, 'star', { color: '#fde047' });
 
     penguinVideo.currentTime = 0;
     penguinVideo.muted = false;
@@ -712,8 +746,7 @@
       trackMove('shoutout_submitted', { category: category, codename: codename });
 
       // Confetti shower!
-      const rect = fxCanvas.getBoundingClientRect();
-      spawnParticles(rect.width / 2, rect.height * 0.4, 70, 'confetti');
+      spawnParticles(canvasWidth / 2, canvasHeight * 0.4, 70, 'confetti');
 
       document.getElementById('shoutoutMessage').value = '';
       document.getElementById('shoutoutCodename').value = '';

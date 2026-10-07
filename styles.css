@@ -22,6 +22,11 @@
   padding: 0;
 }
 
+button, a, input, select, textarea, .hotspot, .invitation-card, .dock-btn {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 [hidden] {
   display: none !important;
 }
