@@ -722,8 +722,32 @@
   const paneFeed = document.getElementById('paneFeed');
   const wallFeed = document.getElementById('wallFeed');
   const wallCount = document.getElementById('wallCount');
+  const filterRecentBtn = document.getElementById('filterRecentBtn');
+  const filterTopBtn = document.getElementById('filterTopBtn');
 
-  // Pre-loaded hostel starter shoutouts
+  let currentWallFilter = 'recent'; // 'recent' | 'top'
+
+  if (filterRecentBtn) {
+    filterRecentBtn.addEventListener('click', () => {
+      currentWallFilter = 'recent';
+      filterRecentBtn.classList.add('active');
+      if (filterTopBtn) filterTopBtn.classList.remove('active');
+      renderWall();
+      trackMove('wall_filter_switched', { filter: 'recent' });
+    });
+  }
+
+  if (filterTopBtn) {
+    filterTopBtn.addEventListener('click', () => {
+      currentWallFilter = 'top';
+      filterTopBtn.classList.add('active');
+      if (filterRecentBtn) filterRecentBtn.classList.remove('active');
+      renderWall();
+      trackMove('wall_filter_switched', { filter: 'top' });
+    });
+  }
+
+  // Pre-loaded hostel starter shoutouts (marked as examples)
   const DEFAULT_SHOUTOUTS = [
     {
       id: 1,
@@ -731,7 +755,8 @@
       message: 'How do we survive 8:30 AM lectures after hostel night-outs? Real survival fundas only please 🙏',
       author: 'Sleepy Fresher 😴',
       time: '45m ago',
-      likes: 42
+      likes: 0,
+      isExample: true
     },
     {
       id: 2,
@@ -739,7 +764,8 @@
       message: 'Heard 3rd years boast about their dance moves, hope you guys can match our energy on Oct 10! 🕺🔥',
       author: 'Frontrow Fresher 🕶️',
       time: '2h ago',
-      likes: 58
+      likes: 0,
+      isExample: true
     },
     {
       id: 3,
@@ -747,7 +773,8 @@
       message: 'Petition for the DJ to blast 2000s Bollywood party anthems & Punjabi beats so the common room goes crazy!',
       author: 'Dancefloor King 🎧',
       time: '4h ago',
-      likes: 49
+      likes: 0,
+      isExample: true
     },
     {
       id: 4,
@@ -755,14 +782,29 @@
       message: 'Huge shoutout to the wingmates who share boiling water and Maggi at 2 AM before assignment deadlines 🤝',
       author: 'Hostel Night Owl 🍜',
       time: '6h ago',
-      likes: 67
+      likes: 0,
+      isExample: true
     }
   ];
 
   function getShoutouts() {
     try {
-      const stored = localStorage.getItem('quantum_leap_shoutouts_v2');
+      const stored = localStorage.getItem('quantum_leap_shoutouts_v3');
       if (stored) return JSON.parse(stored);
+
+      // Migrate from older versions if user posted notes
+      const v2 = localStorage.getItem('quantum_leap_shoutouts_v2');
+      if (v2) {
+        const parsed = JSON.parse(v2);
+        const migrated = parsed.map(item => {
+          if (item.id <= 4) {
+            return { ...item, isExample: true, likes: 0 };
+          }
+          return { ...item, isExample: false };
+        });
+        localStorage.setItem('quantum_leap_shoutouts_v3', JSON.stringify(migrated));
+        return migrated;
+      }
     } catch (e) {
       console.warn('LocalStorage error', e);
     }
@@ -771,7 +813,7 @@
 
   function saveShoutouts(list) {
     try {
-      localStorage.setItem('quantum_leap_shoutouts_v2', JSON.stringify(list));
+      localStorage.setItem('quantum_leap_shoutouts_v3', JSON.stringify(list));
     } catch (e) {
       console.warn('LocalStorage error', e);
     }
@@ -779,18 +821,55 @@
 
   function renderWall() {
     const list = getShoutouts();
-    if (wallCount) wallCount.textContent = list.length;
+    const realMessages = list.filter(item => !item.isExample);
+
+    // Wall count counts genuine submitted notes, excluding examples
+    if (wallCount) {
+      wallCount.textContent = realMessages.length;
+    }
     if (!wallFeed) return;
 
-    wallFeed.innerHTML = list.map(item => `
-      <div class="wall-card" data-id="${item.id}">
+    let displayList = [];
+    if (currentWallFilter === 'top') {
+      // Do not count / display filler examples in top liked messages
+      displayList = list
+        .filter(item => !item.isExample && (item.likes || 0) > 0)
+        .sort((a, b) => (b.likes || 0) - (a.likes || 0));
+
+      if (displayList.length === 0) {
+        wallFeed.innerHTML = `
+          <div class="wall-empty-state">
+            <div class="empty-icon">❤️</div>
+            <h4>No Liked Notes Yet</h4>
+            <p>Example notes are not counted in rankings. Drop a note and be the first to get upvotes!</p>
+            <button type="button" class="btn-drop-now" id="btnDropNow">Write a Note ✍️</button>
+          </div>
+        `;
+        const dropNowBtn = document.getElementById('btnDropNow');
+        if (dropNowBtn) {
+          dropNowBtn.addEventListener('click', () => switchTab('drop'));
+        }
+        return;
+      }
+    } else {
+      // Recent filter: show genuine notes first, followed by example templates
+      const userNotes = list.filter(item => !item.isExample);
+      const exampleNotes = list.filter(item => item.isExample);
+      displayList = [...userNotes, ...exampleNotes];
+    }
+
+    wallFeed.innerHTML = displayList.map(item => `
+      <div class="wall-card ${item.isExample ? 'is-example' : ''}" data-id="${item.id}">
         <div class="wall-card-header">
-          <span class="wall-card-badge">${escapeHtml(item.category)}</span>
+          <div style="display:inline-flex;align-items:center;gap:6px;">
+            <span class="wall-card-badge">${escapeHtml(item.category)}</span>
+            ${item.isExample ? '<span class="example-tag">💡 Example</span>' : ''}
+          </div>
           <span class="wall-card-author">${escapeHtml(item.author)} • ${item.time || 'Today'}</span>
         </div>
         <div class="wall-card-msg">${escapeHtml(item.message)}</div>
         <div class="wall-card-footer">
-          <button type="button" class="like-chip" data-id="${item.id}">
+          <button type="button" class="like-chip" data-id="${item.id}" ${item.isExample ? 'title="Example template note"' : ''}>
             ❤️ <span class="like-num">${item.likes || 0}</span>
           </button>
         </div>
@@ -799,7 +878,7 @@
 
     // Attach like handlers
     wallFeed.querySelectorAll('.like-chip').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', () => {
         const id = Number(btn.getAttribute('data-id'));
         toggleLike(id, btn);
       });
@@ -822,7 +901,7 @@
 
     btn.querySelector('.like-num').textContent = item.likes;
     saveShoutouts(list);
-    trackMove('shoutout_liked', { post_id: id, total_likes: item.likes });
+    trackMove('shoutout_liked', { post_id: id, total_likes: item.likes, is_example: !!item.isExample });
   }
 
   function escapeHtml(str) {
@@ -896,7 +975,8 @@
         message,
         author: codename,
         time: 'Just now',
-        likes: 1
+        likes: 1,
+        isExample: false
       };
 
       const list = getShoutouts();
@@ -928,6 +1008,12 @@
     openRsvp();
     if (urlParams.get('tab') === 'feed') {
       switchTab('feed');
+      if (urlParams.get('sort') === 'top') {
+        currentWallFilter = 'top';
+        if (filterTopBtn) filterTopBtn.classList.add('active');
+        if (filterRecentBtn) filterRecentBtn.classList.remove('active');
+        renderWall();
+      }
     }
   } else if (urlParams.get('play') === '1') {
     setTimeout(playPenguinVideo, 300);

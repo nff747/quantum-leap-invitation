@@ -480,6 +480,10 @@ body.clean-mode .penguin-video-container {
   white-space: nowrap;
 }
 
+.txt-cal-short {
+  display: none;
+}
+
 .btn-action:hover {
   background: rgba(255, 255, 255, 0.22);
   border-color: rgba(255, 255, 255, 0.35);
@@ -848,6 +852,128 @@ body.clean-mode .calendar-hint {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 6px;
+  gap: 8px;
+}
+
+.wall-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Little Example Tag for filler messages */
+.example-tag {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(252, 211, 77, 0.4);
+  color: #fef08a;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.wall-card.is-example {
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Wall Feed Filter Bar */
+.wall-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding: 5px 8px;
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.filter-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  margin-left: 4px;
+}
+
+.filter-chips {
+  display: flex;
+  gap: 6px;
+}
+
+.filter-chip {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.75);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-chip:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.filter-chip.active {
+  background: rgba(252, 211, 77, 0.22);
+  border-color: rgba(252, 211, 77, 0.6);
+  color: var(--gold-accent);
+  box-shadow: 0 0 10px rgba(252, 211, 77, 0.2);
+}
+
+/* Empty State when Top has 0 user posts */
+.wall-empty-state {
+  text-align: center;
+  padding: 26px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  margin: 10px 0;
+}
+
+.empty-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.wall-empty-state h4 {
+  font-size: 14px;
+  margin: 0 0 6px 0;
+  color: var(--gold-accent);
+}
+
+.wall-empty-state p {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+  margin: 0 0 12px 0;
+}
+
+.btn-drop-now {
+  background: linear-gradient(135deg, #fcd34d, #f59e0b);
+  border: none;
+  border-radius: 20px;
+  color: #3b0311;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.btn-drop-now:hover {
+  transform: scale(1.04);
 }
 
 .wall-card-badge {
@@ -988,18 +1114,71 @@ body.clean-mode .calendar-hint {
   }
 
   .action-bar {
-    padding: 6px 10px;
-    gap: 6px;
+    padding: 5px 8px;
+    gap: 4px;
+    max-width: 98vw;
   }
 
   .btn-action {
-    padding: 7px 11px;
-    font-size: 12px;
+    padding: 6px 9px;
+    font-size: 11.5px;
+    gap: 4px;
+  }
+
+  .btn-rsvp .txt-senior {
+    display: none;
   }
 
   .btn-countdown {
-    max-width: 140px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+    padding: 6px 8px;
+    font-size: 11.5px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .btn-countdown .icon {
+    font-size: 12px;
+  }
+
+  .btn-action.btn-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .action-bar {
+    padding: 4px 6px;
+    gap: 3px;
+  }
+
+  .btn-action {
+    padding: 5px 6px;
+    font-size: 10.5px;
+    gap: 3px;
+  }
+
+  .txt-cal-full {
+    display: none;
+  }
+
+  .txt-cal-short {
+    display: inline;
+  }
+
+  .btn-countdown {
+    padding: 5px 6px;
+    font-size: 10px;
+  }
+
+  .btn-action.btn-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
   }
 }

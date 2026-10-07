@@ -221,19 +221,19 @@
       <!-- Live countdown badge -->
       <button type="button" class="btn-action btn-countdown" id="countdownBtn" title="Click to view full event timeline">
         <span class="icon">⏳</span>
-        <span class="countdown-text" id="countdownText">Calculating...</span>
+        <span class="countdown-text" id="countdownText">3d 2h 45m</span>
       </button>
 
       <!-- Anonymous Q&A / Shoutout button -->
       <button type="button" class="btn-action btn-rsvp" id="openRsvpBtn">
         <span class="icon">💬</span>
-        <span class="label">Senior AMA & Wall</span>
+        <span class="label"><span class="txt-senior">Senior </span>AMA & Wall</span>
       </button>
 
       <!-- Add to calendar dropdown trigger -->
       <button type="button" class="btn-action btn-secondary" id="calendarMenuBtn" title="Add to your calendar">
         <span class="icon">📅</span>
-        <span class="label">Calendar</span>
+        <span class="label"><span class="txt-cal-full">Calendar</span><span class="txt-cal-short">Cal</span></span>
       </button>
 
       <!-- Music Toggle -->
@@ -333,6 +333,19 @@
 
       <!-- Tab 2: Wall Feed -->
       <div class="tab-pane" id="paneFeed" hidden>
+        <!-- Filter bar for Recent vs Top messages -->
+        <div class="wall-filter-bar">
+          <span class="filter-label">Sort By:</span>
+          <div class="filter-chips">
+            <button type="button" class="filter-chip active" id="filterRecentBtn" data-sort="recent">
+              ⚡ Recent
+            </button>
+            <button type="button" class="filter-chip" id="filterTopBtn" data-sort="top">
+              ❤️ Top Liked
+            </button>
+          </div>
+        </div>
+
         <div class="wall-feed-container" id="wallFeed">
           <!-- Feed items injected via JS -->
         </div>
