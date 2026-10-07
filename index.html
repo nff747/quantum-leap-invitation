@@ -67,10 +67,64 @@
         <canvas id="fxCanvas" class="fx-canvas" aria-hidden="true"></canvas>
 
         <!-- Stage Spotlight Beams (Layered over card when active) -->
-        <div class="spotlight-beams" id="spotlightBeams" aria-hidden="true">
-          <div class="beam beam-1"></div>
-          <div class="beam beam-2"></div>
-        </div>
+        <svg class="spotlight-beams" id="spotlightBeams" viewBox="0 0 1440 2560" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="beamGrad1" x1="445" y1="595" x2="980" y2="1550" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#fffbe6" stop-opacity="0.85"/>
+              <stop offset="20%" stop-color="#ffeaa1" stop-opacity="0.55"/>
+              <stop offset="55%" stop-color="#ffd85a" stop-opacity="0.22"/>
+              <stop offset="100%" stop-color="#ffc000" stop-opacity="0"/>
+            </linearGradient>
+
+            <linearGradient id="beamGrad2" x1="368" y1="715" x2="880" y2="1680" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+              <stop offset="20%" stop-color="#ffec9e" stop-opacity="0.6"/>
+              <stop offset="55%" stop-color="#ffd961" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#ffc000" stop-opacity="0"/>
+            </linearGradient>
+
+            <radialGradient id="lensGlareUpper" cx="445" cy="595" r="55" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+              <stop offset="30%" stop-color="#fff5b8" stop-opacity="0.85"/>
+              <stop offset="65%" stop-color="#ffd54f" stop-opacity="0.4"/>
+              <stop offset="100%" stop-color="#ffb300" stop-opacity="0"/>
+            </radialGradient>
+
+            <radialGradient id="lensGlareLower" cx="368" cy="715" r="60" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+              <stop offset="30%" stop-color="#fff5b8" stop-opacity="0.85"/>
+              <stop offset="65%" stop-color="#ffd54f" stop-opacity="0.4"/>
+              <stop offset="100%" stop-color="#ffb300" stop-opacity="0"/>
+            </radialGradient>
+
+            <radialGradient id="stageWashGrad" cx="700" cy="1280" rx="420" ry="320" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#fff5cc" stop-opacity="0.32"/>
+              <stop offset="45%" stop-color="#ffe680" stop-opacity="0.16"/>
+              <stop offset="85%" stop-color="#ffd54f" stop-opacity="0.05"/>
+              <stop offset="100%" stop-color="#ffca28" stop-opacity="0"/>
+            </radialGradient>
+
+            <filter id="beamBlur" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="14"/>
+            </filter>
+            <filter id="washBlur" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="26"/>
+            </filter>
+          </defs>
+
+          <!-- Soft center stage illumination pool -->
+          <ellipse cx="700" cy="1280" rx="400" ry="280" fill="url(#stageWashGrad)" filter="url(#washBlur)"/>
+
+          <!-- Upper Lamp Light Cone (Origin: 445, 595) -->
+          <polygon points="425,580 465,610 1020,1500 580,1650" fill="url(#beamGrad1)" filter="url(#beamBlur)"/>
+
+          <!-- Lower Lamp Light Cone (Origin: 368, 715) -->
+          <polygon points="345,695 390,735 960,1620 500,1780" fill="url(#beamGrad2)" filter="url(#beamBlur)"/>
+
+          <!-- Incandescent Lens Flares right at the spotlight apertures -->
+          <circle cx="445" cy="595" r="45" fill="url(#lensGlareUpper)"/>
+          <circle cx="368" cy="715" r="50" fill="url(#lensGlareLower)"/>
+        </svg>
 
         <!-- Living Penguin Video Overlay (Takes over full card when triggered) -->
         <div class="penguin-video-container" id="penguinVideoContainer" aria-hidden="true">

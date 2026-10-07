@@ -128,12 +128,22 @@
       this.decay = options.decay || (0.008 + Math.random() * 0.012);
 
       if (type === 'petal') {
-        this.vx = (Math.random() - 0.5) * 1.5;
-        this.vy = 1.2 + Math.random() * 2.0;
-        this.size = 8 + Math.random() * 10;
+        // Floating aerodynamics: gentle drift and variety from top-right lily across the card
+        this.vx = (Math.random() - 0.65) * 1.8;
+        this.vy = 1.2 + Math.random() * 1.6;
+        this.len = 22 + Math.random() * 14;
+        this.w = 12 + Math.random() * 8;
         this.rotation = Math.random() * Math.PI * 2;
-        this.rotationSpeed = (Math.random() - 0.5) * 0.06;
-        this.color = options.color || (Math.random() > 0.4 ? '#8B0021' : '#b31238');
+        this.rotationSpeed = (Math.random() - 0.5) * 0.035;
+        this.roll = Math.random() * Math.PI * 2;
+        this.rollSpeed = 0.025 + Math.random() * 0.045;
+        this.pitch = Math.random() * Math.PI * 2;
+        this.pitchSpeed = 0.015 + Math.random() * 0.03;
+        this.swayPhase = Math.random() * Math.PI * 2;
+        this.swaySpeed = 0.035 + Math.random() * 0.03;
+        this.swayAmp = 1.0 + Math.random() * 1.5;
+        this.shadeVariant = Math.floor(Math.random() * 3);
+        this.decay = 0.005 + Math.random() * 0.005; // graceful floating lifespan
       } else if (type === 'confetti') {
         this.vx = (Math.random() - 0.5) * 8;
         this.vy = -(4 + Math.random() * 8);
@@ -154,13 +164,22 @@
 
     update() {
       this.life -= this.decay;
-      if (this.type === 'confetti') {
-        this.vy += this.gravity;
-      }
-      this.x += this.vx;
-      this.y += this.vy;
-      if (this.rotation !== undefined) {
+      if (this.type === 'petal') {
+        this.swayPhase += this.swaySpeed;
+        this.x += this.vx + Math.sin(this.swayPhase) * this.swayAmp;
+        this.y += this.vy;
+        this.roll += this.rollSpeed;
+        this.pitch += this.pitchSpeed;
         this.rotation += this.rotationSpeed;
+      } else {
+        if (this.type === 'confetti') {
+          this.vy += this.gravity;
+        }
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.rotation !== undefined) {
+          this.rotation += this.rotationSpeed;
+        }
       }
     }
 
@@ -172,10 +191,71 @@
       if (this.type === 'petal') {
         context.translate(this.x, this.y);
         context.rotate(this.rotation);
-        context.fillStyle = this.color;
+
+        const scaleX = Math.cos(this.roll);
+        const scaleY = Math.cos(this.pitch);
+        context.scale(scaleX, scaleY);
+
+        const isUpper = (scaleX * scaleY) >= 0;
+
+        // Subtle soft drop shadow for tactile depth
+        context.shadowColor = 'rgba(50, 2, 15, ' + (0.32 * Math.min(1, this.life * 1.5)) + ')';
+        context.shadowBlur = 6;
+        context.shadowOffsetX = 1.5;
+        context.shadowOffsetY = 3;
+
+        // Realistic curved lanceolate Asiatic lily petal
         context.beginPath();
-        context.ellipse(0, 0, this.size, this.size * 0.5, 0, 0, Math.PI * 2);
+        context.moveTo(0, -this.len * 0.52);
+        context.bezierCurveTo(
+          this.w * 0.48, -this.len * 0.32,
+          this.w * 0.54, this.len * 0.12,
+          0, this.len * 0.48
+        );
+        context.bezierCurveTo(
+          -this.w * 0.54, this.len * 0.12,
+          -this.w * 0.48, -this.len * 0.32,
+          0, -this.len * 0.52
+        );
+        context.closePath();
+
+        // Velvety crimson/wine gradient matching the card's Asiatic lily
+        const grad = context.createLinearGradient(0, this.len * 0.48, 0, -this.len * 0.52);
+        if (isUpper) {
+          if (this.shadeVariant === 0) {
+            grad.addColorStop(0, '#580214');   // deep wine base
+            grad.addColorStop(0.3, '#8b0c26'); // rich crimson
+            grad.addColorStop(0.7, '#ab1a38'); // vibrant petal belly
+            grad.addColorStop(1, '#660519');   // dark tip
+          } else if (this.shadeVariant === 1) {
+            grad.addColorStop(0, '#66041a');
+            grad.addColorStop(0.35, '#9d1232');
+            grad.addColorStop(0.75, '#be2348');
+            grad.addColorStop(1, '#7a0720');
+          } else {
+            grad.addColorStop(0, '#4a0110');
+            grad.addColorStop(0.3, '#7d0822');
+            grad.addColorStop(0.7, '#96112f');
+            grad.addColorStop(1, '#5a0316');
+          }
+        } else {
+          // Underside: softer satin tone
+          grad.addColorStop(0, '#63081e');
+          grad.addColorStop(0.5, '#82122b');
+          grad.addColorStop(1, '#530517');
+        }
+
+        context.fillStyle = grad;
         context.fill();
+
+        // Delicate central spine / vein highlight
+        context.shadowColor = 'transparent';
+        context.beginPath();
+        context.moveTo(0, this.len * 0.42);
+        context.quadraticCurveTo(this.w * 0.04, 0, 0, -this.len * 0.48);
+        context.strokeStyle = isUpper ? 'rgba(255, 190, 205, 0.28)' : 'rgba(255, 180, 195, 0.18)';
+        context.lineWidth = 1.1;
+        context.stroke();
       } else if (this.type === 'confetti') {
         context.translate(this.x, this.y);
         context.rotate(this.rotation);
@@ -244,9 +324,15 @@
   // 2. Lily Flower click -> shower petals
   if (lilyBtn) {
     lilyBtn.addEventListener('click', (e) => {
-      const x = e.clientX - canvasLeft;
-      const y = e.clientY - canvasTop;
-      spawnParticles(x, y, 24, 'petal');
+      if (canvasWidth === 0) updateCanvasDimensions();
+      let x = canvasWidth * 0.78;
+      let y = canvasHeight * 0.18;
+      if (e && e.clientX && canvasLeft > 0) {
+        x = e.clientX - canvasLeft;
+        y = e.clientY - canvasTop;
+      }
+      spawnParticles(x, y, 28, 'petal');
+      playTone(783.99, 0.25, 'sine');
       showToast('🌸 Crimson petals floating...');
       trackMove('petals_showered');
     });
@@ -255,8 +341,13 @@
   // 3. Shooting Star click -> sparkle burst
   if (starBtn) {
     starBtn.addEventListener('click', (e) => {
-      const x = e.clientX - canvasLeft;
-      const y = e.clientY - canvasTop;
+      if (canvasWidth === 0) updateCanvasDimensions();
+      let x = canvasWidth * 0.72;
+      let y = canvasHeight * 0.32;
+      if (e && e.clientX && canvasLeft > 0) {
+        x = e.clientX - canvasLeft;
+        y = e.clientY - canvasTop;
+      }
       spawnParticles(x, y, 35, 'star', { color: '#fde047' });
       playTone(880, 0.15, 'sine');
       showToast('💫 Quantum Leap is shining!');
